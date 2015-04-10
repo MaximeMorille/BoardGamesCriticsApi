@@ -36,10 +36,27 @@ class EditorViewTests(TestCase):
     def test_create(self):
         response = self.client.post(reverse('editor-list'),
                                     {'name': 'Black Rock'})
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
 
-        self.client.login(username='test', password='testing')
-        response = self.client.post(reverse('editor-list'),
-                                    {'name': 'Black Rock'})
+        response = self.client.post(
+            reverse('login'),
+            {
+                'username': 'test',
+                'password': 'testing'
+            }
+        )
+        token = response.data['token']
+
+        response = self.client.post(
+            reverse('editor-list'),
+            {
+                'name': 'Black Rock'
+            },
+            HTTP_AUTHORIZATION='JWT '+token
+        )
         self.assertEqual(response.status_code, 201)
-        self.client.logout()
+
+        self.assertEqual(Editor.objects.count(), 1)
+
+        editor = Editor.objects.first()
+        self.assertEqual(editor.name, 'Black Rock')
