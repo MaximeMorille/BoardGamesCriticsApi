@@ -43,6 +43,7 @@ INSTALLED_APPS = (
     'rest_framework_jwt',
     'corsheaders',
     'editors',
+    'board_games',
 )
 
 MIDDLEWARE_CLASSES = (
